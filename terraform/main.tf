@@ -1,6 +1,11 @@
 ############################################
 # Enable Required APIs (safe subset)
 ############################################
+
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
 resource "google_project_service" "services" {
   for_each = toset([
     "iam.googleapis.com",
@@ -80,6 +85,10 @@ resource "google_composer_environment" "composer" {
 
     node_config {
       service_account = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+    }
+
+    software_config {
+      image_version = "composer-2-airflow-2.6.3"
     }
   }
 }
