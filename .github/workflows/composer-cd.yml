@@ -30,13 +30,23 @@ jobs:
       - name: Upload DAGs
         run: |
           DATASET=$(yq e '.dataset' script_execution.yml)
+          echo "DATASET VALUE: [$DATASET]"
+
+          if [ -z "$DATASET" ] || [ "$DATASET" == "null" ]; then
+            echo "❌ dataset missing in script_execution.yml"
+            exit 1
+          fi
 
           FOLDER="$DATASET/dags"
 
+          echo "Checking folder: $FOLDER"
+
           if [ ! -d "$FOLDER" ]; then
-            echo "❌ DAG folder not found"
+            echo "❌ DAG folder not found at $FOLDER"
+            ls -R   # show actual structure
             exit 1
           fi
 
           gsutil -m cp "$FOLDER"/*.py gs://us-central1-airflow3-cc018626-bucket/dags
+
           echo "✅ DAGs uploaded"
