@@ -79,7 +79,7 @@ resource "google_composer_environment" "composer" {
     environment_size = "ENVIRONMENT_SIZE_SMALL"
 
     node_config {
-      service_account = google_service_account.composer_sa.email
+      service_account = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
     }
   }
 }
