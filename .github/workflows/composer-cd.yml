@@ -2,10 +2,6 @@ name: Composer CD
 
 on:
   workflow_dispatch:
-    inputs:
-      dataset_folder:
-        description: "Folder for DAG deployment"
-        required: true
 
 jobs:
   deploy:
@@ -18,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Authenticate to GCP
+      - name: Authenticate
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
@@ -26,17 +22,21 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      - name: Upload DAGs to Composer
+      - name: Install yq
         run: |
-          BASE="${{ github.event.inputs.dataset_folder }}/dags"
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
 
-          if [ ! -d "$BASE" ]; then
+      - name: Upload DAGs
+        run: |
+          DATASET=$(yq e '.dataset' script_execution.yml)
+
+          FOLDER="$DATASET/dags"
+
+          if [ ! -d "$FOLDER" ]; then
             echo "❌ DAG folder not found"
             exit 1
           fi
 
-          echo "📤 Uploading DAGs..."
-
-          gsutil -m cp "$BASE"/*.py gs://us-central1-airflow3-cc018626-bucket/dags
-
+          gsutil -m cp "$FOLDER"/*.py gs://us-central1-airflow3-cc018626-bucket/dags
           echo "✅ DAGs uploaded"

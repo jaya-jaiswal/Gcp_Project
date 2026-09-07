@@ -2,10 +2,6 @@ name: BQ CD
 
 on:
   workflow_dispatch:
-    inputs:
-      dataset_folder:
-        description: "Dataset folder to deploy"
-        required: true
 
 jobs:
   deploy:
@@ -26,7 +22,7 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      # ✅ Install yq (YAML parser)
+      # Install YAML parser
       - name: Install yq
         run: |
           sudo apt-get update
@@ -34,24 +30,25 @@ jobs:
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
-      # 🔥 Execute YAML-driven scripts
+      # 🔥 Execute scripts
       - name: Execute SQL from YAML
         run: |
-          BASE="${{ github.event.inputs.dataset_folder }}"
-          CONFIG="$BASE/script_execution.yml"
+          CONFIG="script_execution.yml"
 
           if [ ! -f "$CONFIG" ]; then
             echo "❌ script_execution.yml not found"
             exit 1
           fi
 
-          echo "📂 Reading config: $CONFIG"
+          DATASET=$(yq e '.dataset' $CONFIG)
+
+          echo "📂 Dataset folder: $DATASET"
 
           SCRIPTS=$(yq e '.scripts[]' $CONFIG)
 
           for script in $SCRIPTS
           do
-            FILE="$BASE/$script"
+            FILE="$DATASET/$script"
 
             if [ ! -f "$FILE" ]; then
               echo "❌ Missing file: $FILE"
