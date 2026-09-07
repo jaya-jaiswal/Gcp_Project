@@ -1,4 +1,4 @@
-name: Deploy to GCP
+name: Deploy Infra
 
 on:
   push:
@@ -6,10 +6,14 @@ on:
 
 permissions:
   contents: read
-  id-token: write   # REQUIRED for OIDC
+  id-token: write
+
+env:
+  PROJECT_ID: project-d0445eef-b5cb-453b-a9a
+  REGION: us-central1
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +26,15 @@ jobs:
         workload_identity_provider: projects/787268830461/locations/global/workloadIdentityPools/github-pool/providers/github-provider-v2
         service_account: github-actions-sa@project-d0445eef-b5cb-453b-a9a.iam.gserviceaccount.com
 
-    - name: Set up gcloud
+    - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v1
 
-    - name: Test access
-      run: |
-        gcloud projects list
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform -chdir=terraform init
+
+    - name: Terraform Apply
+      run: terraform -chdir=terraform apply -auto-approve \
+        -var="project_id=$PROJECT_ID"
