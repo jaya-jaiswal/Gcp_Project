@@ -1,5 +1,5 @@
 ############################################
-# Enable Required APIs
+# Enable Required APIs (safe subset)
 ############################################
 resource "google_project_service" "services" {
   for_each = toset([
@@ -8,15 +8,13 @@ resource "google_project_service" "services" {
     "bigquery.googleapis.com",
     "storage.googleapis.com",
     "dataflow.googleapis.com",
-    "composer.googleapis.com",
-    "compute.googleapis.com",
-    "container.googleapis.com"
+    "composer.googleapis.com"
   ])
   service = each.key
 }
 
 ############################################
-# GCS Bucket (Landing - CSV files)
+# GCS Bucket (Landing)
 ############################################
 resource "google_storage_bucket" "landing" {
   name     = "${var.project_id}-landing-bucket"
@@ -27,7 +25,7 @@ resource "google_storage_bucket" "landing" {
 }
 
 ############################################
-# GCS Bucket (Temp - Dataflow)
+# GCS Bucket (Temp)
 ############################################
 resource "google_storage_bucket" "temp" {
   name     = "${var.project_id}-temp-bucket"
@@ -46,7 +44,30 @@ resource "google_bigquery_dataset" "dataset" {
 }
 
 ############################################
-# Cloud Composer Environment (Airflow)
+# Composer Service Account
+############################################
+resource "google_service_account" "composer_sa" {
+  account_id   = "composer-sa"
+  display_name = "Composer Service Account"
+}
+
+############################################
+# IAM Roles for Composer
+############################################
+resource "google_project_iam_member" "composer_roles" {
+  for_each = toset([
+    "roles/composer.worker",
+    "roles/storage.admin",
+    "roles/bigquery.admin",
+    "roles/dataflow.admin"
+  ])
+
+  role   = each.key
+  member = "serviceAccount:${google_service_account.composer_sa.email}"
+}
+
+############################################
+# Cloud Composer Environment
 ############################################
 resource "google_composer_environment" "composer" {
   name   = "retail-composer"
@@ -54,5 +75,9 @@ resource "google_composer_environment" "composer" {
 
   config {
     environment_size = "ENVIRONMENT_SIZE_SMALL"
+
+    node_config {
+      service_account = google_service_account.composer_sa.email
+    }
   }
 }
