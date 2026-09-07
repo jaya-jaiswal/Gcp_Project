@@ -1,8 +1,7 @@
+dataset: retail-dataset
+
 scripts:
-  # DDL FIRST
   - script/ddl/01_create_dataset.sql
   - script/ddl/02_create_raw_table.sql
   - script/ddl/03_create_final_table.sql
-
-  # THEN LOGIC
   - script/sql/01_sp_clean_orders.sql
