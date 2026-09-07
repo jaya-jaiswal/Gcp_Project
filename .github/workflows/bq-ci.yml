@@ -1,0 +1,24 @@
+name: BQ CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset_folder:
+        description: "Dataset folder (e.g. retail-dataset)"
+        required: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate YAML config
+        run: |
+          FILE="${{ github.event.inputs.dataset_folder }}/script_execution.yml"
+
+          if [ ! -f "$FILE" ]; then
+            echo "❌ script_execution.yml missing"
+            exit 1
+          fi

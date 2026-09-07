@@ -1,0 +1,26 @@
+name: Composer CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset_folder:
+        description: "Folder for DAG deployment"
+        required: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate DAG folder
+        run: |
+          FOLDER="${{ github.event.inputs.dataset_folder }}/dags"
+
+          if [ ! -d "$FOLDER" ]; then
+            echo "❌ DAG folder not found"
+            exit 1
+          fi
+
+          echo "✅ DAG folder exists"

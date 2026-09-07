@@ -1,0 +1,42 @@
+name: Composer CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset_folder:
+        description: "Folder for DAG deployment"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Upload DAGs to Composer
+        run: |
+          BASE="${{ github.event.inputs.dataset_folder }}/dags"
+
+          if [ ! -d "$BASE" ]; then
+            echo "❌ DAG folder not found"
+            exit 1
+          fi
+
+          echo "📤 Uploading DAGs..."
+
+          gsutil -m cp "$BASE"/*.py gs://us-central1-airflow3-cc018626-bucket/dags
+
+          echo "✅ DAGs uploaded"

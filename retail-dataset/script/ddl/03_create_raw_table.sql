@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `retail_dataset.final_orders` (
+  Order_ID STRING,
+  Order_Date DATE,
+  Ship_Date DATE,
+  Ship_Mode STRING,
+  Customer_Name STRING,
+  Segment STRING,
+  Country STRING,
+  City STRING,
+  State STRING,
+  Region STRING,
+  Product_ID STRING,
+  Category STRING,
+  Sub_Category STRING,
+  Product_Name STRING,
+  Sales FLOAT64,
+  Quantity INT64,
+  Discount FLOAT64,
+  Profit FLOAT64,
+  processed_timestamp TIMESTAMP
+);
