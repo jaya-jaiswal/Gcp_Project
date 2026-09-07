@@ -4,4 +4,3 @@ scripts:
   - script/ddl/02_create_raw_table.sql
   - script/ddl/03_create_final_table.sql
   - script/sql/01_sp_clean_orders.sql
-  - script/ddl/03_create_final_table.sql
