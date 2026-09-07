@@ -22,14 +22,39 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
+      # 🔧 Install yq properly
       - name: Install yq
         run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
+      # 🔍 FULL DEBUG (this will expose the issue clearly)
+      - name: Debug Repo + YAML
+        run: |
+          echo "---- ROOT FILES ----"
+          ls
+
+          echo "---- YAML CONTENT ----"
+          cat script_execution.yml
+
+          echo "---- DATASET VALUE ----"
+          DATASET=$(yq e '.dataset' script_execution.yml)
+          echo "DATASET=[$DATASET]"
+
+          echo "---- EXPECTED FOLDER ----"
+          FOLDER="$DATASET/dags"
+          echo "FOLDER=[$FOLDER]"
+
+          echo "---- FULL DIRECTORY TREE ----"
+          ls -R
+
+      # 🚀 Upload DAGs
       - name: Upload DAGs
         run: |
           DATASET=$(yq e '.dataset' script_execution.yml)
+
           echo "DATASET VALUE: [$DATASET]"
 
           if [ -z "$DATASET" ] || [ "$DATASET" == "null" ]; then
@@ -43,9 +68,12 @@ jobs:
 
           if [ ! -d "$FOLDER" ]; then
             echo "❌ DAG folder not found at $FOLDER"
-            ls -R   # show actual structure
+            ls -R
             exit 1
           fi
+
+          echo "---- FILES INSIDE DAGS ----"
+          ls "$FOLDER"
 
           gsutil -m cp "$FOLDER"/*.py gs://us-central1-airflow3-cc018626-bucket/dags
 
