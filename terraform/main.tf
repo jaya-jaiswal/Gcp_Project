@@ -62,6 +62,8 @@ resource "google_project_iam_member" "composer_roles" {
     "roles/dataflow.admin"
   ])
 
+  project = var.project_id   # ✅ ADD THIS
+
   role   = each.key
   member = "serviceAccount:${google_service_account.composer_sa.email}"
 }
