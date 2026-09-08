@@ -20,15 +20,23 @@ with DAG(
 ) as dag:
 
     run_dataflow = DataflowTemplatedJobStartOperator(
-        task_id="run_dataflow",
-        template="gs://dataflow-templates-us-central1/latest/Word_Count",
-        parameters={
-            "inputFile": "gs://dataflow-samples/shakespeare/kinglear.txt",
-            "output": f"gs://us-central1-airflow3-cc018626-bucket/output/result-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-        },
-        location=REGION,
-        project_id=PROJECT_ID,
-    )
+    task_id="run_dataflow",
+    template="gs://dataflow-templates-us-central1/latest/GCS_Text_to_BigQuery",
+    parameters={
+        "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
+        "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
+        "schemaJSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
+        "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp",
+        "writeDisposition": "WRITE_APPEND"
+    },
+    location=REGION,
+    project_id=PROJECT_ID,
+    environment={
+        "serviceAccountEmail": "dataflow-sa@project-d0445eef-b5cb-453b-a9a.iam.gserviceaccount.com",
+        "tempLocation": "gs://us-central1-airflow3-cc018626-bucket/temp",
+        "stagingLocation": "gs://us-central1-airflow3-cc018626-bucket/staging"
+    }
+)
 
     run_sp = BigQueryInsertJobOperator(
         task_id="run_sp",
