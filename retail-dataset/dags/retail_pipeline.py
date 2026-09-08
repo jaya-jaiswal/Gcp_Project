@@ -1,7 +1,8 @@
 from airflow import DAG
 from airflow.utils.dates import days_ago
-from airflow.providers.google.cloud.operators.dataflow import DataflowStartFlexTemplateOperator
+from airflow.providers.google.cloud.operators.dataflow import DataflowTemplatedJobStartOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
+from datetime import datetime
 
 PROJECT_ID = "project-d0445eef-b5cb-453b-a9a"
 REGION = "us-central1"
@@ -15,26 +16,20 @@ with DAG(
     start_date=days_ago(1),
     schedule="0 10 * * *",
     catchup=False,
+    default_args=default_args,
 ) as dag:
 
-    # 🚀 Dataflow via Flex Template (modern way)
-    run_dataflow = DataflowStartFlexTemplateOperator(
+    run_dataflow = DataflowTemplatedJobStartOperator(
         task_id="run_dataflow",
-        body={
-            "launchParameter": {
-                "jobName": "retail-dataflow-job",
-                "containerSpecGcsPath": "gs://dataflow-templates-us-central1/latest/flex/Word_Count",
-                "parameters": {
-                    "inputFile": "gs://dataflow-samples/shakespeare/kinglear.txt",
-                    "output": "gs://us-central1-airflow3-cc018626-bucket/output/result"
-                }
-            }
+        template="gs://dataflow-templates-us-central1/latest/Word_Count",
+        parameters={
+            "inputFile": "gs://dataflow-samples/shakespeare/kinglear.txt",
+            "output": f"gs://us-central1-airflow3-cc018626-bucket/output/result-{datetime.now().strftime('%Y%m%d%H%M%S')}"
         },
         location=REGION,
         project_id=PROJECT_ID,
     )
 
-    # 🧠 Stored Procedure
     run_sp = BigQueryInsertJobOperator(
         task_id="run_sp",
         configuration={
