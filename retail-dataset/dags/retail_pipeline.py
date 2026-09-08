@@ -10,7 +10,7 @@ BUCKET = "us-central1-airflow3-cc018626-bucket"
 with DAG(
     dag_id="retail_end_to_end_pipeline",
     start_date=datetime(2024, 1, 1),
-    schedule=None,
+    schedule="0 10 * * *",
     catchup=False
 ) as dag:
 
