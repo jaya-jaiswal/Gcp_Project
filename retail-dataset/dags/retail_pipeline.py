@@ -25,7 +25,8 @@ with DAG(
         "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/data/*.csv",
         "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
         "JSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
-        "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp"
+        "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp",
+        "skipHeaderLines": "1"
     },
     location=REGION,
     project_id=PROJECT_ID,
