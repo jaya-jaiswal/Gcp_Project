@@ -19,24 +19,24 @@ with DAG(
 
     # 🚀 Dataflow Job (PERMANENT FIX - VERSION LOCKED)
     run_dataflow = DataflowTemplatedJobStartOperator(
-        task_id="run_dataflow",
-        
-        # ❗ VERSION PINNED (NO MORE BREAKING CHANGES)
-        template="gs://dataflow-templates-us-central1/2023-12-12-00_RC00/GCS_Text_to_BigQuery",
+    task_id="run_dataflow",
+    template="gs://dataflow-templates-us-central1/2023-12-12-00_RC00/GCS_Text_to_BigQuery",
+    parameters={
+        "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
+        "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
+        "JSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
+        "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp"
+    },
+    location=REGION,
+    project_id=PROJECT_ID,
 
-        parameters={
-            "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
-            "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
-            
-            # ✅ Correct param for this template
-            "JSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
-
-            "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp"
-        },
-
-        location=REGION,
-        project_id=PROJECT_ID
-    )
+    # ✅ SAFE + IMPORTANT
+    environment={
+        "numWorkers": 1,
+        "maxWorkers": 1,
+        "machineType": "n1-standard-1"
+    }
+)
 
     # 🧠 Stored Procedure
     run_sp = BigQueryInsertJobOperator(
