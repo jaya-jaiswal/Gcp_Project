@@ -2,7 +2,6 @@ from airflow import DAG
 from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.operators.dataflow import DataflowTemplatedJobStartOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
-from datetime import datetime
 
 PROJECT_ID = "project-d0445eef-b5cb-453b-a9a"
 REGION = "us-central1"
@@ -12,26 +11,34 @@ default_args = {
 }
 
 with DAG(
-    dag_id="retail_prod_pipeline_v2",
+    dag_id="retail_prod_pipeline_final",
     start_date=days_ago(1),
     schedule="0 10 * * *",
     catchup=False,
-    default_args=default_args,
 ) as dag:
 
+    # 🚀 Dataflow Job (PERMANENT FIX - VERSION LOCKED)
     run_dataflow = DataflowTemplatedJobStartOperator(
-    task_id="run_dataflow",
-    template="gs://dataflow-templates-us-central1/latest/GCS_Text_to_BigQuery",
-    parameters={
-        "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
-        "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
-        "JSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
-        "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp"
-    },
-    location=REGION,
-    project_id=PROJECT_ID
-)
+        task_id="run_dataflow",
+        
+        # ❗ VERSION PINNED (NO MORE BREAKING CHANGES)
+        template="gs://dataflow-templates-us-central1/2024-01-15-00_RC00/GCS_Text_to_BigQuery",
 
+        parameters={
+            "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
+            "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
+            
+            # ✅ Correct param for this template
+            "JSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
+
+            "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp"
+        },
+
+        location=REGION,
+        project_id=PROJECT_ID
+    )
+
+    # 🧠 Stored Procedure
     run_sp = BigQueryInsertJobOperator(
         task_id="run_sp",
         configuration={
