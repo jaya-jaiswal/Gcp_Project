@@ -22,7 +22,7 @@ with DAG(
     task_id="run_dataflow",
     template="gs://dataflow-templates-us-central1/2023-12-12-00_RC00/GCS_Text_to_BigQuery",
     parameters={
-        "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
+        "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/data/*.csv",
         "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
         "JSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
         "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp"
