@@ -22,15 +22,17 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      # 🔧 Install yq properly
+      # 🔧 Install yq (FIXED)
       - name: Install yq
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo apt-get clean
+          sudo apt-get update --fix-missing
+          sudo apt-get install -y jq wget
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
-      # 🔍 FULL DEBUG (this will expose the issue clearly)
+      # 🔍 Debug
       - name: Debug Repo + YAML
         run: |
           echo "---- ROOT FILES ----"
