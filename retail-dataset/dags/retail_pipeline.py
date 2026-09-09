@@ -27,14 +27,14 @@ with DAG(
         "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
         "schemaJSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
         "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp",
-        "writeDisposition": "WRITE_APPEND"
+        "writeDisposition": "WRITE_APPEND",
+        "skipLeadingRows": "1"
     },
     location=REGION,
     project_id=PROJECT_ID,
     environment={
         "serviceAccountEmail": "dataflow-sa@project-d0445eef-b5cb-453b-a9a.iam.gserviceaccount.com",
-        "tempLocation": "gs://us-central1-airflow3-cc018626-bucket/temp",
-        "stagingLocation": "gs://us-central1-airflow3-cc018626-bucket/staging"
+        "tempLocation": "gs://us-central1-airflow3-cc018626-bucket/temp"
     }
 )
 
