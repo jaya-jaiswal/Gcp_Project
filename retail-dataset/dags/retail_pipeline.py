@@ -29,7 +29,7 @@ with DAG(
             "delimiter": ",",
             "csvFormat": "DEFAULT",
             "badRecordsOutputTable": f"{PROJECT_ID}:retail_dataset.bad_records"
-}
+},
         location=REGION,
         project_id=PROJECT_ID,
         environment={
