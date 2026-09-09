@@ -26,9 +26,10 @@ with DAG(
             "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
             "schemaJSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
             "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp",
-            "skipLeadingRows": "1",
-            "fieldDelimiter": ","
-        },
+            "delimiter": ",",
+            "csvFormat": "DEFAULT",
+            "badRecordsOutputTable": f"{PROJECT_ID}:retail_dataset.bad_records"
+}
         location=REGION,
         project_id=PROJECT_ID,
         environment={
