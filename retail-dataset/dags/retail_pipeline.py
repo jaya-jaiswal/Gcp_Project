@@ -22,7 +22,7 @@ with DAG(
         task_id="run_dataflow",
         
         # ❗ VERSION PINNED (NO MORE BREAKING CHANGES)
-        template="gs://dataflow-templates-us-central1/2023-12-12-00_RC00/GCS_Text_to_BigQuery"
+        template="gs://dataflow-templates-us-central1/2023-12-12-00_RC00/GCS_Text_to_BigQuery",
 
         parameters={
             "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/*.csv",
