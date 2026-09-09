@@ -17,28 +17,26 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    # 🚀 Dataflow Job (PERMANENT FIX - VERSION LOCKED)
+    # 🚀 Dataflow Job
     run_dataflow = DataflowTemplatedJobStartOperator(
-    task_id="run_dataflow",
-    template="gs://dataflow-templates-us-central1/2026-09-08-00_RC01/GCS_CSV_to_BigQuery",
-    parameters={
-    "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/data/*.csv",
-    "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
-    "schemaJSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
-    "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp",
-    "skipLeadingRows": "1",
-    "fieldDelimiter": ","
-}
-    location=REGION,
-    project_id=PROJECT_ID,
-
-    # ✅ SAFE + IMPORTANT
-     environment={
-        "numWorkers": 1,
-        "maxWorkers": 1,
-        "machineType": "e2-standard-2"
-    }
-)
+        task_id="run_dataflow",
+        template="gs://dataflow-templates-us-central1/2026-09-08-00_RC01/GCS_CSV_to_BigQuery",
+        parameters={
+            "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/data/*.csv",
+            "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
+            "schemaJSONPath": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/schema.json",
+            "bigQueryLoadingTemporaryDirectory": "gs://us-central1-airflow3-cc018626-bucket/temp",
+            "skipLeadingRows": "1",
+            "fieldDelimiter": ","
+        },
+        location=REGION,
+        project_id=PROJECT_ID,
+        environment={
+            "numWorkers": 1,
+            "maxWorkers": 1,
+            "machineType": "e2-standard-2"
+        }
+    )
 
     # 🧠 Stored Procedure
     run_sp = BigQueryInsertJobOperator(
