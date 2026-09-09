@@ -31,10 +31,10 @@ with DAG(
     project_id=PROJECT_ID,
 
     # ✅ SAFE + IMPORTANT
-    environment={
+     environment={
         "numWorkers": 1,
         "maxWorkers": 1,
-        "machineType": "n1-standard-1"
+        "machineType": "e2-standard-2"
     }
 )
 
