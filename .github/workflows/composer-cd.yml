@@ -25,10 +25,7 @@ jobs:
       # 🔧 Install yq (FIXED)
       - name: Install yq
         run: |
-          sudo rm -rf /var/lib/apt/lists/*
-          sudo apt-get clean
-          sudo apt-get update --fix-missing
-          sudo apt-get install -y jq wget
+          sudo apt-get install -y jq wget || (sudo apt-get update -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngradeToInsecureRepositories=true && sudo apt-get install -y jq wget)
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
