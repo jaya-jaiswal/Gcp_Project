@@ -20,7 +20,7 @@ with DAG(
     # 🚀 Dataflow Job (PERMANENT FIX - VERSION LOCKED)
     run_dataflow = DataflowTemplatedJobStartOperator(
     task_id="run_dataflow",
-    template="gs://dataflow-templates-us-central1/2023-12-12-00_RC00/GCS_CSV_to_BigQuery",
+    template="gs://dataflow-templates-us-central1/2026-09-08-00_RC01/GCS_CSV_to_BigQuery",
     parameters={
     "inputFilePattern": "gs://project-d0445eef-b5cb-453b-a9a-landing-bucket/data/*.csv",
     "outputTable": f"{PROJECT_ID}:retail_dataset.raw_orders",
